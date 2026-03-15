@@ -65,7 +65,20 @@ end
 
 function DayLight:Init()
 	DayLight:SetTime()
-	
+
+-- Force spawn a skypaint entity if the map doesn't have one
+	if #ents.FindByClass("env_skypaint") == 0 then
+		local skypaint = ents.Create("env_skypaint")
+		skypaint:Spawn()
+		skypaint:Activate()
+	end
+
+	-- Force spawn a sun entity if the map doesn't have one
+	if #ents.FindByClass("env_sun") == 0 then
+		local sun = ents.Create("env_sun")
+		sun:Spawn()
+		sun:Activate()
+	end
 
 -- Find ALL Entities
 	for _,v in ipairs(ents.GetAll()) do

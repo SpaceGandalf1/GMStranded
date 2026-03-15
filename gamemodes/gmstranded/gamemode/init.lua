@@ -4222,14 +4222,62 @@ function SGS_EmitHitSound( mat, pos )
 end
 
 function SGS_CalcPropHealth( ent )
+	-- Safety check to prevent errors if the entity or its physics don't exist yet
+	if not IsValid( ent ) or not IsValid( ent:GetPhysicsObject() ) then return end
+
 	local maxvol = 147456
 	local maxhp = 300
 
+	-- Calculate the base HP purely from how large the physical model is
 	local vol = ent:GetPhysicsObject():GetVolume()
-	local hp
-	hp = math.floor((vol / maxvol) * maxhp)
-	if ent:GetMaterialType() == MAT_CONCRETE then hp = math.floor(hp * 1.5) end
-	if ent:GetMaterialType() == MAT_METAL then hp = math.floor(hp * 2) end
+	local hp = math.floor((vol / maxvol) * maxhp)
+
+	-- 1. Base Source Engine Material Multipliers
+	local mat = ent:GetMaterialType()
+	
+	if mat == MAT_GLASS then
+		hp = math.floor(hp * 0.2)     -- Glass is extremely fragile (20% health)
+	elseif mat == MAT_PLASTIC then
+		hp = math.floor(hp * 0.5)     -- Plastic is weak (50% health)
+	elseif mat == MAT_WOOD then
+		hp = math.floor(hp * 0.8)     -- Generic wood is slightly below average (80% health)
+	elseif mat == MAT_DIRT or mat == MAT_SAND or mat == MAT_FOLIAGE then
+		hp = math.floor(hp * 0.4)     -- Dirt, Sand, and Leaves are soft
+	elseif mat == MAT_COMPUTER then
+		hp = math.floor(hp * 0.6)     -- Electronics and computers are brittle
+	elseif mat == MAT_CONCRETE or mat == MAT_TILE then
+		hp = math.floor(hp * 1.5)     -- Concrete and Tile are solid and strong (150% health)
+	elseif mat == MAT_METAL or mat == MAT_GRATE or mat == MAT_VENT then
+		hp = math.floor(hp * 2.0)     -- Metals are incredibly tough (200% health)
+	elseif mat == MAT_ALIENFLESH or mat == MAT_FLESH then
+		hp = math.floor(hp * 1.2)     -- Fleshy props are somewhat resilient
+	end
+
+	-- 2. Custom Stranded Tier Multipliers (Intercepting the UID)
+	if ent.uid then
+		if string.find(ent.uid, "betastone") then
+			hp = math.floor(hp * 1.5)
+		elseif string.find(ent.uid, "betametal") then
+			hp = math.floor(hp * 2.0)
+		elseif string.find(ent.uid, "betawood") then
+			hp = math.floor(hp * 1.0) -- Base Wood
+		elseif string.find(ent.uid, "oakwood") then
+			hp = math.floor(hp * 1.5) -- 50% stronger
+		elseif string.find(ent.uid, "maplewood") then
+			hp = math.floor(hp * 2.0) -- 100% stronger
+		elseif string.find(ent.uid, "pinewood") then
+			hp = math.floor(hp * 2.5) -- 150% stronger
+		elseif string.find(ent.uid, "yewwood") then
+			hp = math.floor(hp * 3.0) -- 200% stronger
+		elseif string.find(ent.uid, "buckeyewood") then
+			hp = math.floor(hp * 4.0) -- 300% stronger
+		elseif string.find(ent.uid, "palmwood") then
+			hp = math.floor(hp * 5.5) -- 450% stronger (Endgame Base)
+		end
+	end
+
+	-- 3. Fail-safe to ensure tiny props don't have 0 health
+	if hp < 10 then hp = 10 end
 
 	ent.health = hp
 	ent.maxhealth = hp

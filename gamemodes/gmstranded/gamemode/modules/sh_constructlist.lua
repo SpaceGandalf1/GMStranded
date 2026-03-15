@@ -261,6 +261,17 @@ RECIPE.spawntime = 4
 RECIPE.xp = 150
 Menu_RegisterStructure( "other", RECIPE )
 
+RECIPE = {}
+RECIPE.model = "models/props_c17/canister01a.mdl"
+RECIPE.title = "Ballast Tank"
+RECIPE.description = "Controls submarine buoyancy!\nRequires Oxygen Tanks to pressurize."
+RECIPE.cost = { iron = 20, metal = 20, glass = 5 }
+RECIPE.reqlvl = { construction = 20 }
+RECIPE.ent = "gms_ballast"
+RECIPE.spawntime = 5
+RECIPE.xp = 200
+Menu_RegisterStructure( "other", RECIPE )
+
 /*
 Doors Construction
 */
