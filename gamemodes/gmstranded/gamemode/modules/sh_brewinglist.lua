@@ -888,14 +888,25 @@ Menu_RegisterBrewing( "firstaid", RECIPE )
 
 RECIPE = {}
 RECIPE.title = "Oxygen Tank"
+<<<<<<< HEAD
 RECIPE.material = "vgui/hud/oxygen.png" 
 RECIPE.ptype = "firstaid"
 RECIPE.uid = "oxygen_tank"
+=======
+RECIPE.material = "vgui/firstaid/oxygen_tank.png" 
+RECIPE.ptype = "firstaid"
+RECIPE.uid = "aid5"
+>>>>>>> d359a4599f4d92d1150953185e35703a9bbd3f4a
 RECIPE.mname = "oxygen_tank"
 RECIPE.description = "Refills your O2 supply while underwater.\nAlso used to pressurize submarines."
 RECIPE.gives = { oxygen_tank = 1}
 RECIPE.cost = { iron = 5, metal = 5, glass = 2 }
 RECIPE.reqlvl = { construction = 10 }
 RECIPE.xp = 45
+<<<<<<< HEAD
 RECIPE.alttext = "Pressurizing Suit..."
 Menu_RegisterBrewing( "firstaid", RECIPE )
+=======
+RECIPE.alttext = "Inhaling Oxygen..."
+Menu_RegisterBrewing( "firstaid", RECIPE )
+>>>>>>> d359a4599f4d92d1150953185e35703a9bbd3f4a
