@@ -56,7 +56,7 @@ AID_ITEM.cost = { wood = 10 }
 AID_ITEM.reqlvl = { alchemy = 1 }
 AID_ITEM.gives = { splint = 1 }
 AID_ITEM.xp = 15
-Menu_RegisterAlch( "first aid items", AID_ITEM 
+Menu_RegisterAlch( "first aid items", AID_ITEM )
 
 local AID_ITEM = {}
 AID_ITEM.material = "vgui/hud/oxygen.png" 
@@ -68,4 +68,5 @@ AID_ITEM.cost = { iron = 5, metal = 5, glass = 2 }
 AID_ITEM.reqlvl = { construction = 10 } 
 AID_ITEM.gives = { oxygen_tank = 1 } 
 AID_ITEM.xp = 45
+AID_ITEM.ptype = "firstaid"
 Menu_RegisterAlch( "first aid items", AID_ITEM )

@@ -885,3 +885,17 @@ RECIPE.reqlvl = { alchemy = 1}
 RECIPE.xp = 15
 RECIPE.alttext = "Applying Splint..."
 Menu_RegisterBrewing( "firstaid", RECIPE )
+
+RECIPE = {}
+RECIPE.title = "Oxygen Tank"
+RECIPE.material = "vgui/hud/oxygen.png" 
+RECIPE.ptype = "firstaid"
+RECIPE.uid = "oxygen_tank"
+RECIPE.mname = "oxygen_tank"
+RECIPE.description = "Refills your O2 supply while underwater.\nAlso used to pressurize submarines."
+RECIPE.gives = { oxygen_tank = 1}
+RECIPE.cost = { iron = 5, metal = 5, glass = 2 }
+RECIPE.reqlvl = { construction = 10 }
+RECIPE.xp = 45
+RECIPE.alttext = "Pressurizing Suit..."
+Menu_RegisterBrewing( "firstaid", RECIPE )
