@@ -56,16 +56,16 @@ AID_ITEM.cost = { wood = 10 }
 AID_ITEM.reqlvl = { alchemy = 1 }
 AID_ITEM.gives = { splint = 1 }
 AID_ITEM.xp = 15
-Menu_RegisterAlch( "first aid items", AID_ITEM )
+Menu_RegisterAlch( "first aid items", AID_ITEM 
 
-RECIPE = {}
-RECIPE.uid = "oxygen_tank"
-RECIPE.mname = "oxygen_tank"
-RECIPE.title = "Oxygen Tank"
-RECIPE.description = "Refills your O2 supply while underwater.\nAlso used to pressurize submarines."
-RECIPE.model = "models/props_c17/canister_propane01a.mdl" 
-RECIPE.ptype = "firstaid"
-RECIPE.cost = { iron = 5, metal = 5, glass = 2 }
-RECIPE.reqlvl = { construction = 10 } 
-RECIPE.xp = 45
+local AID_ITEM = {}
+AID_ITEM.material = "vgui/hud/oxygen.png" 
+AID_ITEM.title = "Oxygen Tank"
+AID_ITEM.stitle = "Oxygen Tank"
+AID_ITEM.uid = "oxygen_tank" 
+AID_ITEM.description = "Refills your O2 supply while underwater.\nAlso used to pressurize submarines."
+AID_ITEM.cost = { iron = 5, metal = 5, glass = 2 }
+AID_ITEM.reqlvl = { construction = 10 } 
+AID_ITEM.gives = { oxygen_tank = 1 } 
+AID_ITEM.xp = 45
 Menu_RegisterAlch( "first aid items", AID_ITEM )
