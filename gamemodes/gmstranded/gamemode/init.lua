@@ -6994,64 +6994,116 @@ function GM.getUser( target )
 	return plyMatch
 end
 
-timer.Create("SGS_OceanContraptionUnfreeze", 2, 0, function()
-    -- Get all the custom Stranded props
-    local entsToCheck = ents.FindByClass("gms_prop")
-    
-    -- (Optional) If your workbenches or other structures use different class names, 
-    -- you can add them to the list like this:
-    -- table.Add(entsToCheck, ents.FindByClass("gms_workbench"))
-
-    for _, ent in ipairs(entsToCheck) do
-        -- Check if the entity exists and is touching water
-        if IsValid(ent) and ent:WaterLevel() > 0 then
-            
-            local phys = ent:GetPhysicsObject()
-            
-            -- If the object is currently frozen, we need to unfreeze it and its friends
-            if IsValid(phys) and not phys:IsMotionEnabled() then
-                
-                -- This function grabs the prop AND everything welded/constrained to it
-                local contraption = constraint.GetAllConstrainedEntities(ent)
-                
-                if contraption then
-                    for _, linkedEnt in pairs(contraption) do
-                        if IsValid(linkedEnt) then
-                            local linkedPhys = linkedEnt:GetPhysicsObject()
-                            
-                            -- Unfreeze each attached piece and wake up its physics
-                            if IsValid(linkedPhys) then
-                                linkedPhys:EnableMotion(true)
-                                linkedPhys:Wake()
-                            end
-                        end
-                    end
-                end
-                
-            end
-        end
-    end
-end)
+-- Hook to unfreeze the entire contraption when PICKED UP
 hook.Add("PhysgunPickup", "SGS_PhysgunUnfreezeContraption", function(ply, ent)
-    -- Don't bother with players or the world
     if not IsValid(ent) or ent:IsPlayer() or ent:IsWorld() then return end
 
-    -- Get every entity welded or constrained to the one we just grabbed
     local contraption = constraint.GetAllConstrainedEntities(ent)
-    
     if contraption then
         for _, linkedEnt in pairs(contraption) do
             if IsValid(linkedEnt) then
                 local phys = linkedEnt:GetPhysicsObject()
                 if IsValid(phys) then
-                    -- Enable motion so the whole thing can be moved as one
                     phys:EnableMotion(true)
                     phys:Wake()
                 end
             end
         end
     end
-    
-    -- Returning nothing allows the normal pickup to continue
 end)
 
+-- Hook to handle what happens when the contraption is DROPPED
+hook.Add("PhysgunDrop", "SGS_OceanContraptionDrop", function(ply, ent)
+    if not IsValid(ent) then return end
+
+    -- We use a 0-second timer to wait exactly 1 frame.
+    -- This lets the base Stranded gamemode do its default "freeze" first, 
+    -- and then we immediately override it based on the water level!
+    timer.Simple(0, function()
+        if not IsValid(ent) then return end
+        
+        local contraption = constraint.GetAllConstrainedEntities(ent)
+        if not contraption then return end
+
+        -- SCENARIO A: Dropped in Water (UNFREEZE everything)
+        if ent:WaterLevel() > 0 then
+            for _, linkedEnt in pairs(contraption) do
+                if IsValid(linkedEnt) then
+                    local phys = linkedEnt:GetPhysicsObject()
+                    if IsValid(phys) then
+                        phys:EnableMotion(true)
+                        phys:Wake()
+                    end
+                end
+            end
+            
+        -- SCENARIO B: Dropped on Land (FREEZE everything)
+        else
+            for _, linkedEnt in pairs(contraption) do
+                if IsValid(linkedEnt) then
+                    local phys = linkedEnt:GetPhysicsObject()
+                    if IsValid(phys) then
+                        phys:EnableMotion(false)
+                    end
+                end
+            end
+        end
+        
+    end)
+end)-- Hook to unfreeze the entire contraption when PICKED UP
+hook.Add("PhysgunPickup", "SGS_PhysgunUnfreezeContraption", function(ply, ent)
+    if not IsValid(ent) or ent:IsPlayer() or ent:IsWorld() then return end
+
+    local contraption = constraint.GetAllConstrainedEntities(ent)
+    if contraption then
+        for _, linkedEnt in pairs(contraption) do
+            if IsValid(linkedEnt) then
+                local phys = linkedEnt:GetPhysicsObject()
+                if IsValid(phys) then
+                    phys:EnableMotion(true)
+                    phys:Wake()
+                end
+            end
+        end
+    end
+end)
+
+-- Hook to handle what happens when the contraption is DROPPED
+hook.Add("PhysgunDrop", "SGS_OceanContraptionDrop", function(ply, ent)
+    if not IsValid(ent) then return end
+
+    -- We use a 0-second timer to wait exactly 1 frame.
+    -- This lets the base Stranded gamemode do its default "freeze" first, 
+    -- and then we immediately override it based on the water level!
+    timer.Simple(0, function()
+        if not IsValid(ent) then return end
+        
+        local contraption = constraint.GetAllConstrainedEntities(ent)
+        if not contraption then return end
+
+        -- SCENARIO A: Dropped in Water (UNFREEZE everything)
+        if ent:WaterLevel() > 0 then
+            for _, linkedEnt in pairs(contraption) do
+                if IsValid(linkedEnt) then
+                    local phys = linkedEnt:GetPhysicsObject()
+                    if IsValid(phys) then
+                        phys:EnableMotion(true)
+                        phys:Wake()
+                    end
+                end
+            end
+            
+        -- SCENARIO B: Dropped on Land (FREEZE everything)
+        else
+            for _, linkedEnt in pairs(contraption) do
+                if IsValid(linkedEnt) then
+                    local phys = linkedEnt:GetPhysicsObject()
+                    if IsValid(phys) then
+                        phys:EnableMotion(false)
+                    end
+                end
+            end
+        end
+        
+    end)
+end)
