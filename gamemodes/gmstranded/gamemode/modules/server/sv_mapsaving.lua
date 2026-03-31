@@ -21,7 +21,10 @@ SGS.savedentities = {
     
     -- NPCs
     "npc_kleiner",
-    "npc_vortigaunt"
+    "npc_vortigaunt",
+	"boids",
+	"boidfish",
+	"boidichthyosaur"
 }
 
 function SGS_LoadWorlds()

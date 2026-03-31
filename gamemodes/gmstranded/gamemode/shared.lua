@@ -2,7 +2,37 @@ GM.Name		= "Garry's Mod Stranded"
 GM.Author	= "Zach Petty - Mr.President"
 GM.Email	= "mrp@g4p.org"
 GM.Website	= "http://www.g4p.org"
-GM.Version 	= "18.01.29"
+GM.Version 	= "18.02.29" -- This is now your fallback version
+
+-- =========================================================
+-- AUTOMATIC GITHUB VERSIONING
+-- =========================================================
+if SERVER then
+	local github_owner = "SpaceGandalf1" 
+	local github_repo = "GMStranded"        
+	local branch = "master" -- Change to "main" if your default branch is named main
+
+	hook.Add("Initialize", "SGS_FetchGitHubVersion", function()
+		local apiURL = string.format("https://api.github.com/repos/%s/%s/commits/%s", github_owner, github_repo, branch)
+
+		http.Fetch(apiURL, 
+			function(body, length, headers, code)
+				if code == 200 then
+					local data = util.JSONToTable(body)
+					if data and data.sha then
+						-- Network the first 7 characters of the commit hash
+						SetGlobalString("SGS_Version", string.sub(data.sha, 1, 7))
+						print("[SGS] Server Version updated to GitHub commit: " .. string.sub(data.sha, 1, 7))
+					end
+				else
+					print("[SGS] Failed to fetch GitHub version. Code: " .. code)
+				end
+			end,
+			function(err) print("[SGS] GitHub HTTP Error: " .. err) end
+		)
+	end)
+end
+-- =========================================================
 
 SGS = SGS or {}
 

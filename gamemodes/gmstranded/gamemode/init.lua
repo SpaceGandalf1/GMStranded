@@ -6645,12 +6645,12 @@ hook.Add( "PlayerSay", "SGS_ChatMOTD", SGS_ChatMOTD )
 
 function SGS_SteamGroupPage( ply, text, public )
 	if (string.sub(string.lower(text), 1, 6) == "!steam") then
-		ply:SendLua("gui.OpenURL('http://steamcommunity.com/groups/gman4president')")
+		ply:SendLua("gui.OpenURL('https://steamcommunity.com/groups/SuperiorServers')")
 		return false
 	end
 
 	if (string.sub(string.lower(text), 1, 6) == "!group") then
-		ply:SendLua("gui.OpenURL('http://steamcommunity.com/groups/gman4president')")
+		ply:SendLua("gui.OpenURL('https://steamcommunity.com/groups/SuperiorServers')")
 		return false
 	end
 end
