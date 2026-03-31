@@ -1018,10 +1018,15 @@ function SGS_AllThingsHUD()
 	surface.SetTextColor( 255, 255, 255, 255 )
 	surface.DrawText( SGS.gtokens )
 	
-	surface.SetFont( "SGS_NEWHUD2" )
+		surface.SetFont( "SGS_NEWHUD2" )
 	surface.SetTextColor( 255, 255, 255, 255 )
 	surface.SetTextPos( ScrW() - 90 , 100 )
-	surface.DrawText( "V: " .. GAMEMODE.Version )
+	
+	-- Pull the GitHub hash networked from the server. Fallback to GAMEMODE.Version if it hasn't loaded.
+	local displayVersion = GetGlobalString("SGS_Version", GAMEMODE.Version)
+	
+	surface.DrawText( "V: " .. displayVersion )
+
 	
 	if LocalPlayer().showKeybinds then
 		--Keybinds
