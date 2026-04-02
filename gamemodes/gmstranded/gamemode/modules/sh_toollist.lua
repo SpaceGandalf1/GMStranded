@@ -41,6 +41,30 @@ Menu_RegisterTool( "main", RECIPE )
 ---------------------
 
 RECIPE = {}
+RECIPE.model = "models/weapons/w_huntingbow.mdl"
+RECIPE.skin = 0
+RECIPE.title = "Hunting Bow"
+RECIPE.description = "A ranged weapon for hunting."
+RECIPE.cost = { maple_wood = 18, cloth = 5 }
+RECIPE.reqlvl = { smithing = 40 }
+RECIPE.xp = 150
+RECIPE.entity = "weapon_huntingbow"
+RECIPE.icon = "vgui/tools/mithril_melee.png"
+Menu_RegisterTool( "combat", RECIPE )
+
+RECIPE = {}
+RECIPE.model = "models/weapons/w_huntingbow_arrow.mdl"
+RECIPE.skin = 0
+RECIPE.title = "Hunting Quiver"
+RECIPE.description = "Ammunition for the Hunting Bow."
+RECIPE.cost = { silver = 5, steel = 5, maple_wood = 2 }
+RECIPE.reqlvl = { smithing = 40 } 
+RECIPE.xp = 75
+RECIPE.entity = "huntingbow_quiver"
+RECIPE.icon = "vgui/tools/mithril_melee.png"
+Menu_RegisterTool( "combat", RECIPE )
+
+RECIPE = {}
 RECIPE.model = "models/devonjones/stranded/woodenrod.mdl"
 RECIPE.skin = 0
 RECIPE.title = "Wooden Club"

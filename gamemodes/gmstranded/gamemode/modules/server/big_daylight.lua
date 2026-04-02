@@ -101,49 +101,54 @@ function DayLight:Init()
 
 -- Sun
 	if #DayLight.Sun == 0 then
-		DayLight:Kill( "NO SUN" )
-		return
+		print("[DayLight] Warning: Map has no light_environment. Shadows will not move, but time will continue to tick.")
 	else
 		for k, v in pairs( DayLight.Sun ) do
-			v:Fire( "FadeToPattern", string.char( DayLight.TimeTable.Low ), 0 )
-			v:Activate()
+			if IsValid(v) then
+				v:Fire( "FadeToPattern", string.char( DayLight.TimeTable.Low ), 0 )
+				v:Activate()
+			end
 		end
 	end
 
 -- Remote Suns
 	if #DayLight.RemoteSuns > 0 then
 		for _,v in ipairs(DayLight.RemoteSuns) do
-			v:Fire( "FadeToPattern", string.char( DayLight.TimeTable.Low ), 0 )
-			v:Activate()
+			if IsValid(v) then
+				v:Fire( "FadeToPattern", string.char( DayLight.TimeTable.Low ), 0 )
+				v:Activate()
+			end
 		end
 	end
 
 -- Sun FX
-	if DayLight.Sun_FX == nil then
-		DayLight:Kill( "NO SUN FX" )
-		return
+	if not IsValid(DayLight.Sun_FX) then
+		print("[DayLight] Warning: Map has no Sun FX.")
 	else
 		DayLight.Sun_FX:SetKeyValue( "material" , "sprites/light_glow02_add_noz.vmt" )
 		DayLight.Sun_FX:SetKeyValue( "overlaymaterial" , "sprites/light_glow02_add_noz.vmt" )
 	end
 	
 -- Skypaint Kill
-	if DL.SPEnt == nil then
-		DayLight:Kill( "NO SKYPAINT" )
-		return
+	if not IsValid(DL.SPEnt) then
+		print("[DayLight] Warning: Map has no SkyPaint.")
 	end
 
 -- Overlays
 	if #DayLight.Overlays > 0 then
 		for _,v in ipairs(DayLight.Overlays) do
-			v:Fire( "Enable", "", 0 )
-			v:Fire( "Color", "0 0 0", 0.01 )
+			if IsValid(v) then
+				v:Fire( "Enable", "", 0 )
+				v:Fire( "Color", "0 0 0", 0.01 )
+			end
 		end
 	end
 	if #DayLight.WaterOverlays > 0 then
 		for _,v in ipairs(DayLight.WaterOverlays) do
-			v:Fire( "Enable", "", 0 )
-			v:Fire( "Color", "0 0 0", 0.01 )
+			if IsValid(v) then
+				v:Fire( "Enable", "", 0 )
+				v:Fire( "Color", "0 0 0", 0.01 )
+			end
 		end
 	end
 
@@ -174,7 +179,7 @@ function DayLight:ScaleSBColor( val )
 	if DL == nil then return end
 	
 	if DL.tries >= 5 then return end
-	if DL.SPEnt == nil then 
+	if not IsValid(DL.SPEnt) then 
 		DayLight:FindSkypaintEntity()
 		DL.tries = DL.tries + 1
 		return
@@ -290,8 +295,6 @@ function DayLight:Think()
 	DayLight.NextThink = curtime + 0.05
 	DayLight.Minute = DayLight.Minute + 0.05
 	
-	
-	
 	if SGS.inedit then DayLight.Minute = 720 end
 
 	local SunFX_Angle = 720
@@ -307,9 +310,7 @@ function DayLight:Think()
 		end
 	end
 	
-	
-	
-	if DayLight.Sun_FX then
+	if IsValid(DayLight.Sun_FX) then
 		DayLight.Sun_FX:Fire( "AddOutput", "pitch "..SunFX_Angle, 0 )
 		DayLight.Sun_FX:Activate()
 	end
@@ -327,25 +328,26 @@ function DayLight:Think()
 		DayLight:ChangeTime()
 	end
 	
-
-
 	DayLight.MinuteIndex = math.Clamp( math.Round(DayLight.Minute), 1, DayLight.TimeTable.Length )
 	
 	local pattern = DayLight.LightTable[DayLight.MinuteIndex].Pattern
 	if #DayLight.Sun > 0 then
 		for k, v in pairs( DayLight.Sun ) do
-			v:Fire( "FadeToPattern", pattern, 0 )
-			v:Activate()
+			if IsValid(v) then
+				v:Fire( "FadeToPattern", pattern, 0 )
+				v:Activate()
+			end
 		end
 	end
 
 	if #DayLight.RemoteSuns > 0 then
 		for _,v in ipairs(DayLight.RemoteSuns) do
-			v:Fire( "FadeToPattern", pattern, 0 )
-			v:Activate()
+			if IsValid(v) then
+				v:Fire( "FadeToPattern", pattern, 0 )
+				v:Activate()
+			end
 		end
 	end
-	
 	
 	if DayLight.Minute < 300 then --Night Time After Midnight
 		DayLight:ScaleSBColor(0)
@@ -376,7 +378,6 @@ hook.Add( "Think", "DayLight_Think", DayLight.Think )
 function DayLight:ChangeTime()
 	hook.Call( "DayLightChangeTime", GAMEMODE, math.Round(DayLight.Minute) )
 end
-
 
 function DayLight:GetFade( i )
 	local first = string.Explode( " ", DayLight.LightTable[DayLight.MinuteIndex].Color )
@@ -424,23 +425,29 @@ function DayLight:LightsOn()
 	local pattern = ""
 	local delay = 0
 	for _,v in ipairs(DayLight.NightLights) do
-		-- Flicker Function
-		if math.random() >= 0.50 then
-			pattern = "az"
-		else
-			pattern = "za"
+		if IsValid(v) then
+			-- Flicker Function
+			if math.random() >= 0.50 then
+				pattern = "az"
+			else
+				pattern = "za"
+			end
+
+			delay = math.random() * 3
+
+			v:Fire( "SetPattern", pattern, delay )
+			v:Fire( "TurnOn", "", delay )
+
+			timer.Simple( delay, function() 
+				if IsValid(v) then 
+					v:EmitSound("buttons/button1.wav",math.random()*10+70,math.random()*10+95) 
+				end
+			end )
+
+			delay = delay + math.random()*0.40
+			v:Fire( "SetPattern", "z", delay )
+			v:Fire( "FireUser1", "", delay )
 		end
-
-		delay = math.random() * 3
-
-		v:Fire( "SetPattern", pattern, delay )
-		v:Fire( "TurnOn", "", delay )
-
-		timer.Simple( delay, function() v:EmitSound("buttons/button1.wav",math.random()*10+70,math.random()*10+95) end )
-
-		delay = delay + math.random()*0.40
-		v:Fire( "SetPattern", "z", delay )
-		v:Fire( "FireUser1", "", delay )
 	end
 
 	DayLight.LightsAreOn = true
@@ -448,8 +455,10 @@ end
 
 function DayLight:LightsOff()
 	for _,v in ipairs(DayLight.NightLights) do
-		v:Fire( "TurnOff", "", 0 )
-		v:Fire( "FireUser2", "", 0 )
+		if IsValid(v) then
+			v:Fire( "TurnOff", "", 0 )
+			v:Fire( "FireUser2", "", 0 )
+		end
 	end
 
 	DayLight.LightsAreOn = false

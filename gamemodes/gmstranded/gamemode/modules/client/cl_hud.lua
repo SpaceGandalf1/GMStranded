@@ -988,31 +988,26 @@ function SGS_AllThingsHUD()
 	surface.SetTextPos( ScrW() - 10 - w, y - 175 )
 	surface.DrawText( message )
 	
----Time Text
+	---Time Text
 	surface.SetFont( "SGS_NEWHUD3" )
 	local day = SGS_CheckTimeForDay( SGS.day )
 	
-	-- Step 1: Get the hour and minute using your original, safe shared.lua functions
-	local strHour = SGS_CheckTimeForHour( SGS.time )
-	local strMin = SGS_CheckTimeForMinute( SGS.time )
+	-- Safely grab the raw time directly
+	local currentTime = tonumber(SGS.time) or 0
 	
-	-- Step 2: Convert the hour string to a number to figure out AM/PM
-	local rawHour = tonumber(strHour) or 0
+	-- Calculate hours and minutes directly
+	local rawHour = math.floor( currentTime / 60 )
+	local min = math.floor( currentTime % 60 )
+	
+	-- Determine AM/PM and 12-hour format
 	local ampm = "AM"
-	local displayHour = rawHour
+	if rawHour >= 12 then ampm = "PM" end
 	
-	-- Step 3: Math out the 12-hour clock
-	if rawHour >= 12 then
-		ampm = "PM"
-		if rawHour > 12 then
-			displayHour = rawHour - 12
-		end
-	elseif rawHour == 0 then
-		displayHour = 12
-	end
+	local displayHour = rawHour % 12
+	if displayHour == 0 then displayHour = 12 end
 	
-	-- Step 4: Stitch it together!
-	local time = tostring(displayHour) .. ":" .. tostring(strMin) .. " " .. ampm
+	-- Format the time (e.g., "2:05 PM")
+	local time = string.format("%d:%02d %s", displayHour, min, ampm)
 	
 	local w2, h2 = surface.GetTextSize(time)
 	surface.SetTextPos( ScrW() - 52 - (w2 / 2), 10 )
@@ -1024,12 +1019,7 @@ function SGS_AllThingsHUD()
 	surface.SetTextPos( ScrW() - 52 - (w / 2), 30 )
 	surface.SetTextColor( 255, 255, 255, 255 )
 	surface.DrawText( day )
-	
-	surface.SetFont( "SGS_NEWHUD4" )
-	w, h = surface.GetTextSize(day)
-	surface.SetTextPos( ScrW() - 52 - (w / 2), 30 )
-	surface.SetTextColor( 255, 255, 255, 255 )
-	surface.DrawText( day )
+
 	surface.SetFont( "SGS_NEWHUD3" )
 	surface.SetTextColor( 255, 0, 0, 255 )
 	surface.SetTextPos( ScrW() - 86 , 50 )

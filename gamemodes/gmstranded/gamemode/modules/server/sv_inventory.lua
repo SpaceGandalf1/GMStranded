@@ -376,40 +376,60 @@ function SGS_MakeResourceDrop( rType, rAmt, pos )
 end
 
 function PlayerMeta:DeathDropResources()
-
-	local slvl = self.level[ "survival" ]
+	local slvl = self.level[ "survival" ] or 0 
 	local lvlmodi = slvl * 0.6
 
 	local tbl_dropped = {}
 	local tbl_destroy = {}
+	
+	local cache = nil 
 
 	for k, v in pairs(self.resource) do
 		local dropamt = 0
 		local destroyamt = 0
 
-		if math.random(1,100) + lvlmodi > 45 then
-			local amt = math.random( math.ceil( v / 2 ), v )
-			if amt > 0 then
-				self:DropResource( k, amt, false, true )
-				dropamt = amt
+		if v > 0 and SGS_CanDropResource(k) then
+			-- The original math roll using survival level
+			if math.random(1,100) + lvlmodi > 45 then
+				local amt = math.random( math.ceil( v / 2 ), v )
+				
+				if amt > 0 then
+					dropamt = amt
+					
+					-- Spawn the death chest on the first successfully dropped item
+					if not IsValid(cache) then
+						cache = ents.Create("gms_deathchest")
+						cache:SetPos(self:GetPos() + Vector(0, 0, 20))
+						cache:Spawn()
+						
+						cache:SetNetworkedString("Owner", self:Nick() .. "'s Lost Loot")
+						
+						-- Prevent Prop Protection addons from locking the chest
+						if cache.CPPISetOwnerless then cache:CPPISetOwnerless(true) end 
+						
+						local phys = cache:GetPhysicsObject()
+						if IsValid(phys) then phys:Wake() end
+						
+						-- Auto-remove the chest after 10 minutes if no one claims it
+						SafeRemoveEntityDelayed(cache, 600) 
+					end
+					
+					-- Add the item to the chest
+					cache.contents[k] = (cache.contents[k] or 0) + amt
+				end
 			end
-		end
-
-		if not SGS_CanDropResource(rType) then
-			dropamt = 0
 		end
 
 		destroyamt = v - dropamt
 
 		tbl_dropped[k] = dropamt
 		tbl_destroy[k] = destroyamt
-
 	end
-
+	
+	-- The original function clears the player's remaining inventory at the end
 	self:ClearResources()
 
 	return tbl_dropped, tbl_destroy
-
 end
 
 function SGS_ChatDropResource( ply, text, public )
